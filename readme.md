@@ -1,19 +1,44 @@
-# Helpers
+## Requirements
 
-## Help
+- [rust](https://rustup.rs/)
 
-```shell
+## How to use
+
+Copy `example.env` to `.env`
+
+fill out fields for 
+`BASE_PROJECT_ROUTE=""`
+`BASE_NAMESPACE=""`
+
+run commands
+
+## Commands
+
+### Help
+
+```sh
 cargo run -- -h
 ```
 
-## Generate TS interface from dto class
+### Generate QueryCriteria from Entity Name
 
-```shell
+```sh
+cargo run -- -p generate-query-criterial-from-entity-name -x Customer -e CustomerId -t LastName,string FirstName,string -o o.cs
+```
+
+- `x` Entity Name
+- `e` Entity Id
+- `t` Sort Criteria fields and types (comma separated).
+- `o` output file
+
+### Generate TS interface from dto class
+
+```sh
 cargo run -- -p cs-dto-to-ts-interface -i "./files/dto.cs" -o output.ts
 ```
 
-## Generate QueryCriteria from BaseCrudRepo
+### Generate QueryCriteria from BaseCrudRepo
 
-```shell
-cargo run -- -i ./files/bcr.cs -o o.cs -p generate-query-criteria-from-base-crud-class -e some_entity_id
+```sh
+cargo run -- -i ./files/bcr.cs -o o.cs -p generate-query-criteria-from-base-crud-class -e CustomerId -t FirstName,string LastName,string
 ```
