@@ -1,6 +1,5 @@
-use crate::utils::{
-    self,
-    get_class_name::{extract_entity_from_base_crud_repo_class, get_class_name_and_line_number},
+use crate::utils::get_class_name::{
+    extract_entity_from_base_crud_repo_class, get_class_name_and_line_number,
 };
 
 // TODO This has yet to be finished or tested

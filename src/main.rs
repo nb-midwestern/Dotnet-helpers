@@ -6,7 +6,7 @@ use std::io::{self, Read, Write};
 use std::path::Path;
 mod base_crud_to_query_crud;
 mod c_sharp_dto_to_ts_interface;
-mod c_sharp_entity_to_query_crud;
+
 mod utils;
 
 #[derive(Clone, Debug, clap::ValueEnum, Serialize)]
@@ -33,6 +33,9 @@ struct Args {
 
     #[arg(short, long)]
     entity_id_name: Option<String>,
+
+    #[arg(short, long)]
+    base_name_space: Option<String>,
 }
 
 fn main() -> io::Result<()> {

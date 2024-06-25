@@ -20,7 +20,7 @@ pub fn get_class_name_and_line_number(file_data: String) -> Option<(String, usiz
     for (index, line) in file_data.lines().enumerate() {
         if let Some(captures) = class_regex.captures(&line) {
             if let Some(class_name) = captures.get(1) {
-                return Some((class_name.as_str().to_string(), index + 1));
+                return Some((class_name.as_str().to_string(), index));
             }
         }
     }

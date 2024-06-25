@@ -1,6 +1,7 @@
 use crate::utils::{
     self,
     get_class_name::{extract_entity_from_base_crud_repo_class, get_class_name_and_line_number},
+    get_namespace::get_base_namespace,
 };
 
 pub fn run(content: String, entity_id_name: Option<String>) -> String {
@@ -9,11 +10,21 @@ pub fn run(content: String, entity_id_name: Option<String>) -> String {
     let base_project_route =
         std::env::var("BASE_PROJECT_ROUTE").unwrap_or("{No value found}".to_string());
 
+    let base_namespace = get_base_namespace(content.clone());
+
     let entity_name =
         utils::get_class_name::extract_entity_from_base_crud_repo_class(content.clone()).unwrap();
     println!("ClassName {}", entity_name);
-    let sortable_enum = generate_sortable_field_enum(entity_name.clone(), entity_id_name.clone());
-    let query_criteria_class = generate_query_criteria(entity_name.clone(), entity_id_name.clone());
+    let sortable_enum = generate_sortable_field_enum(
+        entity_name.clone(),
+        entity_id_name.clone(),
+        base_namespace.clone(),
+    );
+    let query_criteria_class = generate_query_criteria(
+        entity_name.clone(),
+        entity_id_name.clone(),
+        base_namespace.clone(),
+    );
     let new_repo = new_repository_name(content.clone());
     let new_interface = new_repo_interface_name(entity_name.clone());
     return format!(
@@ -51,16 +62,26 @@ pub fn run(content: String, entity_id_name: Option<String>) -> String {
 //     ExpireDate,
 // }
 
-fn generate_sortable_field_enum(entity_name: String, entity_id_name: String) -> String {
+fn generate_sortable_field_enum(
+    entity_name: String,
+    entity_id_name: String,
+    namespace: Option<String>,
+) -> String {
+    let namespace = match namespace {
+        Some(base_namespace) => format!("namespace {base_namespace}.Core.Domain;"),
+        None => "".to_string(),
+    };
     return format!(
         r#"
-public enum  {entity_name}SortableField
+{namespace}
+
+public enum {entity_name}SortableField
 {{
     {entity_id_name},
     EffectiveDate,
     ExpireDate, 
 }}
-"#
+"#,
     );
 }
 
@@ -73,9 +94,20 @@ public enum  {entity_name}SortableField
 //     };
 // }
 
-fn generate_query_criteria(entity_name: String, entity_id_name: String) -> String {
+fn generate_query_criteria(
+    entity_name: String,
+    entity_id_name: String,
+    namespace: Option<String>,
+) -> String {
+    let namespace = match namespace {
+        Some(base_namespace) => format!("namespace {base_namespace}.Core.Domain;"),
+        None => "".to_string(),
+    };
+
     return format!(
         r#"
+{namespace}
+
 public class  {entity_name}QueryCriteria : DefaultQueryCriteria<{entity_name}SortableField>
 {{
     public override SortCriteria<{entity_name}SortableField> SortCriteria {{ get; set; }} = new()
@@ -96,10 +128,12 @@ fn new_repository_name(file_content: String) -> String {
         .lines()
         .enumerate()
         .map(|(index, line)| {
-            if index == class_line_number {
-                return format!("\n{class_name} : BaseQueryCrudRepository<{entity_name}, {entity_name}QueryCriteria, {entity_name}SortableField>, I{class_name} \n {{");
-            }
+            if index == class_line_number  {
+                return format!("\n internal class {class_name} : BaseQueryCrudRepository<{entity_name}, {entity_name}QueryCriteria, {entity_name}SortableField>, I{class_name}");
+            } 
+            
             format!("\n{line}")
+            
         })
         .collect();
 
@@ -110,7 +144,7 @@ fn new_repo_interface_name(entity_name: String) -> String {
     return format!(
         r#"
 public interface I{entity_name}Repository :
-    ICrudRepository<{entity_name}>, IQueryCriteriaRepository<DealerRateBuildProfile, DealerRateBuildProfileQueryCriteria, DealerRateBuildProfileSortableField>
+    ICrudRepository<{entity_name}>, IQueryCriteriaRepository<{entity_name}, {entity_name}QueryCriteria, {entity_name}SortableField>
 {{
         
 }}
