@@ -3,35 +3,39 @@ use crate::utils::{
     get_class_name::{extract_entity_from_base_crud_repo_class, get_class_name_and_line_number},
 };
 
+// TODO This has yet to be finished or tested
+// The goal is to generate each file for a new query crud from entity
+
 pub fn run(content: String, entity_id_name: Option<String>) -> String {
     let entity_id_name = entity_id_name.unwrap_or("<REPLACE_WITH_ENTITY_ID_NAME>".to_string());
 
     let base_project_route =
         std::env::var("BASE_PROJECT_ROUTE").unwrap_or("{No value found}".to_string());
+    let (entity_class_name, class_line_number) =
+        get_class_name_and_line_number(content.clone()).unwrap();
 
-    let entity_name =
-        utils::get_class_name::extract_entity_from_base_crud_repo_class(content.clone()).unwrap();
-    println!("ClassName {}", entity_name);
-    let sortable_enum = generate_sortable_field_enum(entity_name.clone(), entity_id_name.clone());
-    let query_criteria_class = generate_query_criteria(entity_name.clone(), entity_id_name.clone());
+    let sortable_enum =
+        generate_sortable_field_enum(entity_class_name.clone(), entity_id_name.clone());
+    let query_criteria_class =
+        generate_query_criteria(entity_class_name.clone(), entity_id_name.clone());
     let new_repo = new_repository_name(content.clone());
-    let new_interface = new_repo_interface_name(entity_name.clone());
+    let new_interface = new_repo_interface_name(entity_class_name.clone());
     return format!(
         r#"
     // SORTABLE FIELD ENUM
-    // touch {base_project_route}Core/Domain/{entity_name}SortableField.cs
+    // touch {base_project_route}Core/Domain/{entity_class_name}SortableField.cs
     {sortable_enum}
 
     // QUERY CRITERIA CLASS
-    // touch {base_project_route}Core/Domain/{entity_name}QueryCriteria.cs
+    // touch {base_project_route}Core/Domain/{entity_class_name}QueryCriteria.cs
     {query_criteria_class}
 
     // Updated Repository
-    // touch {base_project_route}Infrastructure/Repositories/{entity_name}Repository
+    // touch {base_project_route}Infrastructure/Repositories/{entity_class_name}Repository
     {new_repo}
 
     //UPDATED INTERFACE
-    // touch {base_project_route}Infrastructure/Interfaces/I{entity_name}Repository
+    // touch {base_project_route}Infrastructure/Interfaces/I{entity_class_name}Repository
     {new_interface}
     "#,
     );
