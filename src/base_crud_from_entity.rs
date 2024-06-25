@@ -56,7 +56,7 @@ fn new_repository(
     namespace: Option<String>,
 ) -> String {
     let namespace = match namespace {
-        Some(base_namespace) => format!("namespace {base_namespace}.Core.Domain;"),
+        Some(base_namespace) => format!("namespace {base_namespace}.Infrastructure.Repositories;"),
         None => "".to_string(),
     };
 
@@ -66,11 +66,11 @@ fn new_repository(
                 let field_type = field.field_type.as_str();
                 let field = field.field;
                 match field_type {
-                    x if x.contains("[]") => {
+                    x if x.contains("List<") => {
                         return format!("\n\t\t.WhereIf(criteria.{field}.Any, e => e.{field} == criteria.{field})") 
                     }
                     "string" => {
-                         return format!("\n\t\t.WhereIf(!string.IsNullOrEmpty({field}), e => e.{field} == criteria.{field})")
+                         return format!("\n\t\t.WhereIf(!string.IsNullOrEmpty(criteria.{field}), e => e.{field} == criteria.{field})")
                     },
                     "int" => {
                         return format!("\n\t\t.WhereIf(criteria.{field}.HasValue, e => e.{field} == criteria.{field})") 

@@ -54,7 +54,7 @@ fn new_repository_name(file_content: String, sortable_fields: Option<Vec<FieldWi
                     let field_type = field.field_type.as_str();
                     let field = field.field;
                     match field_type {
-                        x if x.contains("[]") => {
+                        x if x.contains("List<") => {
                             return format!("\n.WhereIf(criteria.{field}.Any, e => e.{field} == criteria.{field})") 
                         }
                         "string" => {
