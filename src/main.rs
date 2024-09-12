@@ -12,6 +12,7 @@ mod base_crud_from_entity;
 mod base_crud_to_query_crud;
 mod c_sharp_dto_to_ts_interface;
 mod crud_query;
+mod unit_test_generator;
 
 mod utils;
 
@@ -21,6 +22,7 @@ enum Programs {
     CsDtoToTsInterface,
     GenerateQueryCriteriaFromBaseCrudClass,
     GenerateQueryCriterialFromEntityName,
+    UnitTestGenerator,
 }
 
 #[derive(Clone, Debug)]
@@ -99,6 +101,10 @@ fn main() -> io::Result<()> {
             args.entity_name.expect("Entity Name field is required"),
             args.entity_id_name,
             args.type_sortable_fields,
+        ),
+        Programs::UnitTestGenerator => unit_test_generator::run(
+            read_from_file(args.in_file.expect("Input file must be specified").as_str())
+                .expect("Error reading file"),
         ),
     };
 
