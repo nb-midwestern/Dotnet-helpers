@@ -42,3 +42,9 @@ cargo run -- -p cs-dto-to-ts-interface -i "./files/dto.cs" -o output.ts
 ```sh
 cargo run -- -i ./files/bcr.cs -o o.cs -p generate-query-criteria-from-base-crud-class -e CustomerId -t FirstName,string LastName,string
 ```
+
+
+### Generate Service Unit test from service class
+```sh
+cargo run -- -p unit-test-generator -i "pathto/ContractService.cs"  -o test.cs
+```
