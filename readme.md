@@ -46,5 +46,5 @@ cargo run -- -i ./files/bcr.cs -o o.cs -p generate-query-criteria-from-base-crud
 
 ### Generate Service Unit test from service class
 ```sh
-cargo run -- -p unit-test-generator -i "pathto/ContractService.cs"  -o test.cs
+cargo run -- -p unit-test-generator -i "pathto/myservice.cs"  -o test.cs
 ```
